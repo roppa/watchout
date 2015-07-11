@@ -3,7 +3,10 @@ var radius = 20;
 var gameSettings = {
   width: 600,
   height: 400,
-  enemies: 2
+  enemies: 20,
+  score: 0,
+  highScore: 0,
+  collisions: 0
 };
 
 // var drag = d3.behavior.drag()
@@ -40,8 +43,10 @@ var enemies = board
                   .attr("class", "asteroid")
                   .attr("height", 30)
                   .attr("width", 30)
+                  .attr("collided", "0")
                   .attr("x", function (d) { return Math.random() * gameSettings.width - radius })
                   .attr("y", function (d) { return Math.random() * gameSettings.height - radius });
+
 
 
 function dragmove(d) {
@@ -50,21 +55,59 @@ function dragmove(d) {
       .attr("cy", d.y = Math.max(radius, Math.min(gameSettings.height - radius, d3.event.y)));
 }
 
-function checkCollisions (x, y) {
-  // var currentPlayerPosition = player.attr("x")
-  console.log("Player:", player.attr("cx"), player.attr("cy"));
-  console.log("Enemy:", x, y);
+function checkCollisions (enemyX, enemyY) {
+  // x distance player x - enemy x
+  var xDistance = player.attr("cx") - enemyX;
+  // y distance gets play y - enemy y
+  var yDistance = player.attr("cy") - enemyY;
+  // distance gets the square root of x^2 + y^2
+  var distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
+  // if distance > 2 * radius
+  return distance < 2 * radius;
 }
+
+var colideOnce = function () {
+  var asteroid = d3.select(this);
+  return function () {
+  var collided = checkCollisions(asteroid.attr('x'), asteroid.attr('y'));
+    if (collided) {
+      gameSettings.score = 0;
+      score();
+      if (asteroid.attr('collided') === "0") {
+        asteroid.attr('collided', "1");
+        gameSettings.collisions++;
+        collision();
+      }
+    } else {
+      asteroid.attr('collided', "0");
+    }
+  }
+}
+
+var collision = function() {
+  d3.selectAll('.collisions')
+    .select('span')
+    .text(gameSettings.collisions);
+}
+
+var score = function () {
+  d3.select(".current span").text(gameSettings.score);
+  
+  if (gameSettings.score > gameSettings.highScore) {
+    gameSettings.highScore = gameSettings.score;
+    d3.select(".high span").text(gameSettings.highScore);
+  }
+}
+
 
 setInterval(function () {
   board.selectAll("image")
         .transition().duration(1000)
-        .tween(null, function(){
-          var asteroid = d3.select(this);
-          return function () {
-            checkCollisions(asteroid.attr('x'), asteroid.attr('y'));
-          }
-        })
+        .tween(null, colideOnce)
         .attr("x", function (d) { return Math.random() * gameSettings.width - radius; })
-        .attr("y", function (d) { return Math.random() * gameSettings.height - radius; })
+        .attr("y", function (d) { return Math.random() * gameSettings.height - radius; });
+  gameSettings.score++
+  score();
+  
 }, 1000);
+  

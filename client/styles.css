@@ -6,7 +6,8 @@ body {
 }
 
 .board {
-  background-color: #ccc;
+  background: transparent url(nebula.jpg) 0 0 no-repeat;
+  background-size:600px 400px;
   width: 600px;
   height: 400px;
   margin: 0 auto;
@@ -16,4 +17,9 @@ body {
   position: absolute;
   top: 30px;
   right: 30px;
+}
+
+.asteroid {
+  width: 20px;
+  height: 20px;
 }
