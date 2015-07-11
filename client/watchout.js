@@ -1,15 +1,21 @@
 var radius = 20;
 
+var gameSettings = {
+  width: 600,
+  height: 400,
+  enemies: 20
+};
+
 var drag = d3.behavior.drag()
     .on("drag", dragmove);
 
-var asteroids = d3.range(14).map(function (item) {
-  return { id: item, x: 10, y: 10}
+var asteroids = d3.range(gameSettings.enemies).map(function (item) {
+  return { id: item };
 });
 
 var board = d3.select("body").append("svg")
-                  .attr("width" , "100%")
-                  .attr("height" , "100%")
+                  .attr("width" , gameSettings.width)
+                  .attr("height" , gameSettings.height)
                   .attr("class" , "board");
 
 var player = board.append("circle")
@@ -27,8 +33,8 @@ var enemies = board
                   .attr("class", "asteroid")
                   .attr("height", 30)
                   .attr("width", 30)
-                  .attr("x", function (d) { return Math.random() * window.innerWidth - radius })
-                  .attr("y", function (d) { return Math.random() * window.innerHeight - radius })
+                  .attr("x", function (d) { return Math.random() * gameSettings.width - radius })
+                  .attr("y", function (d) { return Math.random() * gameSettings.height - radius })
 
 function dragmove(d) {
   var x = d3.event.x;
@@ -39,6 +45,10 @@ function dragmove(d) {
 setInterval(function () {
   board.selectAll("image")
         .transition().duration(1000)
-        .attr("x", function (d) { return Math.random() * window.innerWidth - radius; })
-        .attr("y", function (d) { return Math.random() * window.innerHeight - radius; })
+        .attr("x", function (d) { return Math.random() * gameSettings.width - radius; })
+        .attr("y", function (d) { return Math.random() * gameSettings.height - radius; })
 }, 1000);
+
+setInterval(function () {
+  console.log(d3.selectAll('image').attr("x"));
+}, 100)
